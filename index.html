@@ -96,7 +96,7 @@
         //获取省.json里面的数据进行填充
         fetch('省.json').then(res=>res.json()).then(data=>{
 
-            alert(data.length);//测试一下，看看是不是31个省
+            alert("省份："+data.length);//测试一下，看看是不是31个省
 
             data.forEach(item=>{
                 
@@ -132,9 +132,9 @@
                     
                 });
             
-            });
-
-            alert("加载完成的动画");//加载完成的动画
+            })
+            .then(response => alert('Success:', response));
+            // alert("加载完成的动画");//加载完成的动画
 
         }
         
