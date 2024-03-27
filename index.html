@@ -1,0 +1,229 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>China-Area-Region-Administrative-Divisions</title>
+<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+<meta name="format-detection" content="telephone=no" />
+<style>
+    *{
+        margin: 0;
+        padding: 0;
+        border: 0;
+        box-sizing: border-box;
+        text-decoration: none;
+        color:#333;
+        background-color: #ffffff;
+        -webkit-appearance: none;/*解决ios样式问题*/
+        outline: none;
+    }
+    .t{
+        text-align:center;
+        font-size: 18px;
+        font-weight: 100;
+        letter-spacing: 5px;
+        margin-bottom: 50px;
+        line-height: 60px;
+    }
+    .hr{
+        width: 90vw;
+        margin: 5vw;
+        height: 1px;
+        background-color: #e5e5e5;
+    }
+    .demo{
+        width: 90vw;
+        margin: 5vw;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        grid-gap: 10px;
+    }
+    form {
+        width: 100%;
+        text-align: center;
+    }
+    form select{
+        width: 100px;
+        height: 30px;
+        border: 1px solid #333;
+        padding-left: 5px;
+    }
+    .footer{
+        width: 100%;
+        text-align: center;
+        font-size: 12px;
+        margin-top: 50px;
+        margin-bottom: 50px;
+    }
+</style>
+</head>
+<body>
+    <br /><br /><br />
+    <p class="t">省市区镇村演示Demo.</p>
+    <div class="hr"></div>
+    <div class="demo">
+        <form action="demo.php" method="post">
+            <select name="Province">
+                <option value="">--省--</option>
+            </select>
+            <select name="City">
+                <option value="">--市--</option>
+            </select>
+            <select name="DistrictsAndCounties">
+                <option value="">--区县--</option>
+            </select>
+            <select name="TownStreets">
+                <option value="">--镇街道--</option>
+            </select>
+            <select name="Village">
+                <option value="">--村--</option>
+            </select>
+        </form>
+    </div>
+    <div class="hr"></div>
+    <div class="footer">
+        <p>Github地址：</p>
+        <a href="https://github.com/657258535/China-Area-Region-Administrative-Divisions">China-Area-Region-Administrative-Divisions</a>
+    </div>
+    <script>
+        var datas = Array();
+        //可以根据用户IP所在地直接对应调取省份的数据
+        //先让用户选择省份，然后监听用户的选择
+        const Select = document.querySelectorAll('select');
+
+        // alert(Select.length);//看下拿到的对象是不是五个
+
+        //获取省.json里面的数据进行填充
+        fetch('省.json').then(res=>res.json()).then(data=>{
+
+            alert(data.length);//测试一下，看看是不是31个省
+
+            data.forEach(item=>{
+                
+                Select[0].innerHTML += `<option value="${item.name}">${item.name}</option>`;
+                
+            });
+            
+        });
+        
+        //监听用户选择省份，然后获取对应省份的城市信息
+        Select[0].onchange =  ()=>{
+            
+            alert(Select[0].value);//测试一下看看能不能拿到正确的数据
+            
+            //每次选择省份的时候，先清空市，区县，镇街道，村
+            Select[1].innerHTML = `<option value="">--市--</option>`;
+                
+            Select[2].innerHTML = `<option value="">--区县--</option>`;
+                    
+            Select[3].innerHTML = `<option value="">--镇街道--</option>`;
+                        
+            Select[4].innerHTML = `<option value="">--村--</option>`;
+            
+
+            //加载中动画
+            fetch("中国/" + Select[0].value + ".json").then(res=>res.json()).then(data=>{
+
+                datas = data;
+
+                data['children'].forEach(item=>{
+                    
+                    Select[1].innerHTML += `<option value="${item.name}">${item.name}</option>`;
+                    
+                });
+            
+            });
+
+            alert("加载完成的动画");//加载完成的动画
+
+        }
+        
+
+        //监听用户选择城市，然后获取对应城市的区县信息
+        Select[1].onchange =  ()=>{
+
+            alert(Select[1].value);//测试一下看看能不能拿到正确的数据
+
+            Select[2].innerHTML = `<option value="">--区县--</option>`;
+                    
+            Select[3].innerHTML = `<option value="">--镇街道--</option>`;
+                        
+            Select[4].innerHTML = `<option value="">--村--</option>`;
+
+                datas['children'].forEach(item=>{
+
+                    if(item.name == Select[1].value){
+                            
+                        item['children'].forEach(item=>{
+                                
+                            Select[2].innerHTML += `<option value="${item.name}">${item.name}</option>`;
+                            
+                            });
+                    }
+                });
+        }
+        
+        //监听用户选择区县，然后获取对应区的镇街道信息
+        Select[2].onchange =  ()=>{
+
+            alert(Select[2].value);//测试一下看看能不能拿到正确的数据
+
+            Select[3].innerHTML = `<option value="">--镇街道--</option>`;
+                        
+            Select[4].innerHTML = `<option value="">--村--</option>`;
+
+                datas['children'].forEach(item=>{
+
+                    if(item.name == Select[1].value){
+                            
+                        item['children'].forEach(item=>{
+                            
+                            if(item.name == Select[2].value){
+                                
+                                item['children'].forEach(item=>{
+                                    
+                                    Select[3].innerHTML += `<option value="${item.name}">${item.name}</option>`;
+                                     
+                                })
+                            }
+                        })
+                        
+                    }
+                })
+        }
+
+        //监听用户选择镇街道，然后获取对应镇街道的村信息
+        Select[3].onchange =  ()=>{
+
+            alert(Select[3].value);//测试一下看看能不能拿到正确的数据
+
+            Select[4].innerHTML = `<option value="">--村--</option>`;
+
+                datas['children'].forEach(item=>{
+
+                    if(item.name == Select[1].value){
+                        
+                        item['children'].forEach(item=>{
+                            
+                            if(item.name == Select[2].value){
+                                
+                                item['children'].forEach(item=>{
+                                    
+                                    if(item.name == Select[3].value){
+                                        
+                                        item['children'].forEach(item=>{
+                                            
+                                            Select[4].innerHTML += `<option value="${item.name}">${item.name}</option>`;
+                                                
+                                            
+                                        })
+                                    }
+                                })
+                            }
+                        })
+                    }
+            })
+        }
+    </script>
+</body>
+</html>

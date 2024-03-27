@@ -1,0 +1,92 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Eternal pages</title>
+<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+<meta name="format-detection" content="telephone=no" />
+<link rel="icon" href="logo.svg" type="image/x-icon"> 
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hint.css@3.0.0/hint.min.css">
+<style>
+    *{
+        margin: 0;
+        padding: 0;
+        border: 0;
+        box-sizing: border-box;
+        text-decoration: none;
+        color:#333;
+        background-color: #ffffff;
+        -webkit-appearance: none;/*解决ios样式问题*/
+        outline: none;
+    }
+    .t{
+        text-align:center;
+        font-size: 18px;
+        font-weight: 100;
+        letter-spacing: 5px;
+        margin-bottom: 50px;
+        line-height: 60px;
+    }
+    .hr{
+        width: 90vw;
+        margin: 5vw;
+        height: 1px;
+        background-color: #e5e5e5;
+    }
+    .demo{
+        width: 90vw;
+        margin: 5vw;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        grid-gap: 10px;
+    }
+    form {
+        width: 100%;
+        text-align: center;
+    }
+    form select{
+        width: 100px;
+        height: 30px;
+        border: 1px solid #333;
+        padding-left: 5px;
+    }
+</style>
+</head>
+<body>
+    <br /><br /><br />
+    <p class="t">省市区镇村演示Demo.</p>
+    <div class="hr"></div>
+    <div class="demo">
+        <form action="demo.php" method="post">
+            <select name="Province">
+                <option value="">--省--</option>
+            </select>
+            <select name="City">
+                <option value="">--市--</option>
+            </select>
+            <select name="DistrictsAndCounties">
+                <option value="">--区县--</option>
+            </select>
+            <select name="TownStreets">
+                <option value="">--镇街道--</option>
+            </select>
+            <select name="Village">
+                <option value="">--村--</option>
+            </select>
+        </form>
+    </div>
+    <script>
+        //可以根据用户IP所在地直接对应调取省份的数据
+        //先让用户选择省份，然后监听用户的选择
+        const Select = document.querySelectorAll('select');
+        
+        // alert(Select.length);//看下拿到的对象是不是五个
+        Select[0].onchange =  ()=>{
+            // alert(Select[0].value);//测试一下看看能不能拿到正确的数据
+            
+        }
+        //选择触发，填充对应城市信息
+        
+    </script>
+</body>
+</html>
