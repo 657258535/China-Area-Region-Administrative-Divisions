@@ -87,142 +87,147 @@
     </div>
     <script>
         var datas = Array();
-        //可以根据用户IP所在地直接对应调取省份的数据
-        //先让用户选择省份，然后监听用户的选择
+        // 先让用户选择省份，然后监听用户的选择
         const Select = document.querySelectorAll('select');
+        
+        // 添加加载状态提示
+        function showLoading(select) {
+            select.innerHTML += `<option value="" disabled selected>加载中...</option>`;
+            select.disabled = true;
+        }
+        
+        function hideLoading(select) {
+            select.disabled = false;
+        }
 
-        // alert(Select.length);//看下拿到的对象是不是五个
-
-        //获取省.json里面的数据进行填充
-        fetch('province.json').then(res=>res.json()).then(data=>{
-
-            alert("省份："+data.length);//测试一下，看看是不是31个省
-
-            data.forEach(item=>{
-                
-                Select[0].innerHTML += `<option value="${item.name}">${item.name}</option>`;
-                
+        // 获取省份数据
+        fetch('province.json')
+            .then(res => res.json())
+            .then(data => {
+                data.forEach(item => {
+                    Select[0].innerHTML += `<option value="${item.name}">${item.name}</option>`;
+                });
+            })
+            .catch(error => {
+                console.error('获取省份数据失败:', error);
+                alert('获取省份数据失败，请刷新页面重试');
             });
-            
-        });
         
-        //监听用户选择省份，然后获取对应省份的城市信息
-        Select[0].onchange =  ()=>{
-            
-            alert(Select[0].value);//测试一下看看能不能拿到正确的数据
-            
-            //每次选择省份的时候，先清空市，区县，镇街道，村
+        // 监听用户选择省份，然后获取对应省份的城市信息
+        Select[0].onchange = () => {
+            // 每次选择省份的时候，先清空市，区县，镇街道，村
             Select[1].innerHTML = `<option value="">--市--</option>`;
+            Select[2].innerHTML = `<option value="">--区县--</option>`;
+            Select[3].innerHTML = `<option value="">--镇街道--</option>`;
+            Select[4].innerHTML = `<option value="">--村--</option>`;
+
+            if (Select[0].value) {
+                // 显示加载状态
+                showLoading(Select[1]);
                 
-            Select[2].innerHTML = `<option value="">--区县--</option>`;
-                    
-            Select[3].innerHTML = `<option value="">--镇街道--</option>`;
+                // 加载对应省份的数据
+                fetch("China/" + Select[0].value + ".json")
+                    .then(res => res.json())
+                    .then(data => {
+                        datas = data;
+                        Select[1].innerHTML = `<option value="">--市--</option>`;
                         
-            Select[4].innerHTML = `<option value="">--村--</option>`;
-            
-
-            //加载中动画
-            fetch("China/" + Select[0].value + ".json").then(res=>res.json()).then(data=>{
-
-                datas = data;
-
-                data['children'].forEach(item=>{
-                    
-                    Select[1].innerHTML += `<option value="${item.name}">${item.name}</option>`;
-                    
-                });
-            
-            })
-            .then(response => alert('Success:', response));
-            // alert("加载完成的动画");//加载完成的动画
-
+                        data['children'].forEach(item => {
+                            Select[1].innerHTML += `<option value="${item.name}">${item.name}</option>`;
+                        });
+                        
+                        hideLoading(Select[1]);
+                    })
+                    .catch(error => {
+                        console.error('获取城市数据失败:', error);
+                        hideLoading(Select[1]);
+                        Select[1].innerHTML = `<option value="">获取城市数据失败</option>`;
+                    });
+            }
         }
-        
 
-        //监听用户选择城市，然后获取对应城市的区县信息
-        Select[1].onchange =  ()=>{
-
-            alert(Select[1].value);//测试一下看看能不能拿到正确的数据
-
+        // 监听用户选择城市，然后获取对应城市的区县信息
+        Select[1].onchange = () => {
+            // 清空下级选择框
             Select[2].innerHTML = `<option value="">--区县--</option>`;
-                    
             Select[3].innerHTML = `<option value="">--镇街道--</option>`;
-                        
             Select[4].innerHTML = `<option value="">--村--</option>`;
 
-                datas['children'].forEach(item=>{
+            if (Select[1].value) {
+                // 显示加载状态
+                showLoading(Select[2]);
 
-                    if(item.name == Select[1].value){
-                            
-                        item['children'].forEach(item=>{
-                                
+                datas['children'].forEach(item => {
+                    if (item.name == Select[1].value) {
+                        Select[2].innerHTML = `<option value="">--区县--</option>`;
+                        
+                        item['children'].forEach(item => {
                             Select[2].innerHTML += `<option value="${item.name}">${item.name}</option>`;
-                            
-                            });
+                        });
+                        
+                        hideLoading(Select[2]);
                     }
                 });
+            }
         }
         
-        //监听用户选择区县，然后获取对应区的镇街道信息
-        Select[2].onchange =  ()=>{
-
-            alert(Select[2].value);//测试一下看看能不能拿到正确的数据
-
+        // 监听用户选择区县，然后获取对应区的镇街道信息
+        Select[2].onchange = () => {
+            // 清空下级选择框
             Select[3].innerHTML = `<option value="">--镇街道--</option>`;
-                        
             Select[4].innerHTML = `<option value="">--村--</option>`;
 
-                datas['children'].forEach(item=>{
+            if (Select[2].value) {
+                // 显示加载状态
+                showLoading(Select[3]);
 
-                    if(item.name == Select[1].value){
-                            
-                        item['children'].forEach(item=>{
-                            
-                            if(item.name == Select[2].value){
+                datas['children'].forEach(item => {
+                    if (item.name == Select[1].value) {
+                        item['children'].forEach(item => {
+                            if (item.name == Select[2].value) {
+                                Select[3].innerHTML = `<option value="">--镇街道--</option>`;
                                 
-                                item['children'].forEach(item=>{
-                                    
+                                item['children'].forEach(item => {
                                     Select[3].innerHTML += `<option value="${item.name}">${item.name}</option>`;
-                                     
-                                })
+                                });
+                                
+                                hideLoading(Select[3]);
                             }
-                        })
-                        
+                        });
                     }
-                })
+                });
+            }
         }
 
-        //监听用户选择镇街道，然后获取对应镇街道的村信息
-        Select[3].onchange =  ()=>{
-
-            alert(Select[3].value);//测试一下看看能不能拿到正确的数据
-
+        // 监听用户选择镇街道，然后获取对应镇街道的村信息
+        Select[3].onchange = () => {
+            // 清空下级选择框
             Select[4].innerHTML = `<option value="">--村--</option>`;
 
-                datas['children'].forEach(item=>{
+            if (Select[3].value) {
+                // 显示加载状态
+                showLoading(Select[4]);
 
-                    if(item.name == Select[1].value){
-                        
-                        item['children'].forEach(item=>{
-                            
-                            if(item.name == Select[2].value){
-                                
-                                item['children'].forEach(item=>{
-                                    
-                                    if(item.name == Select[3].value){
+                datas['children'].forEach(item => {
+                    if (item.name == Select[1].value) {
+                        item['children'].forEach(item => {
+                            if (item.name == Select[2].value) {
+                                item['children'].forEach(item => {
+                                    if (item.name == Select[3].value) {
+                                        Select[4].innerHTML = `<option value="">--村--</option>`;
                                         
-                                        item['children'].forEach(item=>{
-                                            
+                                        item['children'].forEach(item => {
                                             Select[4].innerHTML += `<option value="${item.name}">${item.name}</option>`;
-                                                
-                                            
-                                        })
+                                        });
+                                        
+                                        hideLoading(Select[4]);
                                     }
-                                })
+                                });
                             }
-                        })
+                        });
                     }
-            })
+                });
+            }
         }
     </script>
 </body>
